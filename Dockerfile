@@ -1,23 +1,25 @@
 # Start from the code-server Debian base image
 FROM codercom/code-server:4.0.2
 
-USER coder
+USER root
+
+RUN whoami
+
+RUN adduser demo --gecos "" --disabled-password
+RUN useradd -ms /bin/bash example
+
 
 # Apply VS Code settings
-COPY deploy-container/settings.json .local/share/code-server/User/settings.json
+COPY deploy-container/settings.json /home/demo/.local/share/code-server/User/settings.json
 
 # Use bash shell
 ENV SHELL=/bin/bash
 
-# Install unzip + rclone (support for remote filesystem)
-RUN sudo apt-get update && sudo apt-get install unzip -y
-RUN curl https://rclone.org/install.sh | sudo bash
+# ENV SHELL=/usr/sbin/nologin
 
-# Copy rclone tasks to /tmp, to potentially be used
-COPY deploy-container/rclone-tasks.json /tmp/rclone-tasks.json
 
 # Fix permissions for code-server
-RUN sudo chown -R coder:coder /home/coder/.local
+RUN sudo chown -R demo:demo /home/demo/.local
 
 # You can add custom software and dependencies for your environment below
 # -----------
@@ -34,8 +36,40 @@ RUN sudo chown -R coder:coder /home/coder/.local
 
 # -----------
 
+RUN git clone https://github.com/quintende/redm-codelens-examples.git /home/example/project
+
+RUN ls -al /
+RUN ls -al /tmp/
+# RUN ls -al deploy-container/
+
+# COPY  /tmp/redm-codelens /home/example/project
+
+# Install NodeJS
+RUN git clone https://github.com/quintende/redm-codelens.git /tmp/redm-codelens
+RUN sudo curl -fsSL https://deb.nodesource.com/setup_15.x | sudo bash -
+RUN sudo apt-get install -y nodejs
+RUN sudo npm install -g vsce
+
+RUN npm install --prefix /tmp/redm-codelens/
+RUN npm run --prefix /tmp/redm-codelens/ package-web
+ 
+RUN cd /tmp/redm-codelens/ && vsce package
+
+run ls -al /tmp/redm-codelens/
+
+USER 1001
+
+
+
+RUN code-server --install-extension /tmp/redm-codelens/redm-codelens-0.0.1.vsix
+
+run ls -al /home/demo/.local/share/code-server/extensions/
+
+
+
 # Port
 ENV PORT=8080
+ENV USER=demo
 
 # Use our custom entrypoint script first
 COPY deploy-container/entrypoint.sh /usr/bin/deploy-container-entrypoint.sh
