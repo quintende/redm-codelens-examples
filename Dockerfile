@@ -3,53 +3,41 @@ FROM codercom/code-server:4.0.2
 
 USER root
 
+# Create users
 RUN adduser demo --gecos "" --disabled-password
-RUN useradd -ms /bin/bash example
-
+RUN adduser example --gecos "" --disabled-password
 
 # Apply VS Code settings
 COPY deploy-container/settings.json /home/demo/.local/share/code-server/User/settings.json
 
-# Use bash shell
+# Use nologin shell
 ENV SHELL=/usr/sbin/nologin
-
 
 # Fix permissions for code-server
 RUN sudo chown -R demo:demo /home/demo/.local
 
-# You can add custom software and dependencies for your environment below
-# -----------
+COPY examples/ /home/example/project
 
-# Install a VS Code extension:
-# Note: we use a different marketplace than VS Code. See https://github.com/cdr/code-server/blob/main/docs/FAQ.md#differences-compared-to-vs-code
-# RUN code-server --install-extension esbenp.prettier-vscode
-
-# Install apt packages:
-# RUN sudo apt-get install -y ubuntu-make
-
-# Copy files: 
-# COPY deploy-container/myTool /home/coder/myTool
-
-# -----------
-
-RUN git clone https://github.com/quintende/redm-codelens-examples.git /home/example/project
-
-# Install NodeJS
-RUN git clone https://github.com/quintende/redm-codelens.git /tmp/redm-codelens
+# Install NodeJS && vsce
 RUN sudo curl -fsSL https://deb.nodesource.com/setup_15.x | sudo bash -
 RUN sudo apt-get install -y nodejs
 RUN sudo npm install -g vsce
 
+# Get redm-codelens extension
+RUN git clone https://github.com/quintende/redm-codelens.git /tmp/redm-codelens
+
+# Install && package redm-codelens
 RUN npm install --prefix /tmp/redm-codelens/
 RUN npm run --prefix /tmp/redm-codelens/ package-web
  
+# Create .vsix file
 RUN cd /tmp/redm-codelens/ && vsce package
 
-
+# Set user as "demo" (id: 1000)
 USER 1001
 
+# Install extension in code-server
 RUN code-server --install-extension /tmp/redm-codelens/redm-codelens-0.0.1.vsix
-
 
 # Port
 ENV PORT=8080
