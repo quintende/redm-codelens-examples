@@ -18,26 +18,14 @@ RUN sudo chown -R demo:demo /home/demo/.local
 
 COPY examples/ /home/example/project
 
-# Install NodeJS && vsce
-RUN sudo curl -fsSL https://deb.nodesource.com/setup_15.x | sudo bash -
-RUN sudo apt-get install -y nodejs
-RUN sudo npm install -g vsce
-
-# Get redm-codelens extension
-RUN git clone https://github.com/quintende/redm-codelens.git /tmp/redm-codelens
-
-# Install && package redm-codelens
-RUN npm install --prefix /tmp/redm-codelens/
-RUN npm run --prefix /tmp/redm-codelens/ package-web
- 
-# Create .vsix file
-RUN cd /tmp/redm-codelens/ && vsce package
+// Copy the code-server vsix to the container
+RUN curl https://api.github.com/repos/quintende/redm-codelens/releases | grep -Eo '"browser_download_url": "(.*vsix\.tar\.gz)"' | grep -Eo 'https://[^\"]*' | sed -n '1p' | xargs wget -O - | tar -xz
 
 # Set user as "demo" (id: 1000)
 USER 1001
 
 # Install extension in code-server
-RUN code-server --install-extension /tmp/redm-codelens/redm-codelens-0.0.1.vsix
+RUN code-server --install-extension redm-codelens-0.0.1.vsix
 
 # Port
 ENV PORT=8080
