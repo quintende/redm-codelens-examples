@@ -18,6 +18,9 @@ RUN sudo chown -R demo:demo /home/demo/.local
 
 COPY examples/ /home/example/project
 
+# Install wget
+RUN sudo apt-get install wget
+
 # Copy the code-server vsix to the container
 RUN curl https://api.github.com/repos/quintende/redm-codelens/releases | grep -Eo '"browser_download_url": "(.*vsix\.tar\.gz)"' | grep -Eo 'https://[^\"]*' | sed -n '1p' | xargs wget -O - | tar -xz
 
