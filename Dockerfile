@@ -19,6 +19,7 @@ RUN sudo chown -R demo:demo /home/demo/.local
 COPY examples/ /home/example/project
 
 # Install wget
+RUN sudo apt-get update
 RUN sudo apt-get install wget
 
 # Copy the code-server vsix to the container
