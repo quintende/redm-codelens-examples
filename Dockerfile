@@ -3,8 +3,6 @@ FROM codercom/code-server:4.0.2
 
 USER root
 
-RUN whoami
-
 RUN adduser demo --gecos "" --disabled-password
 RUN useradd -ms /bin/bash example
 
@@ -13,9 +11,7 @@ RUN useradd -ms /bin/bash example
 COPY deploy-container/settings.json /home/demo/.local/share/code-server/User/settings.json
 
 # Use bash shell
-ENV SHELL=/bin/bash
-
-# ENV SHELL=/usr/sbin/nologin
+ENV SHELL=/usr/sbin/nologin
 
 
 # Fix permissions for code-server
@@ -38,12 +34,6 @@ RUN sudo chown -R demo:demo /home/demo/.local
 
 RUN git clone https://github.com/quintende/redm-codelens-examples.git /home/example/project
 
-RUN ls -al /
-RUN ls -al /tmp/
-# RUN ls -al deploy-container/
-
-# COPY  /tmp/redm-codelens /home/example/project
-
 # Install NodeJS
 RUN git clone https://github.com/quintende/redm-codelens.git /tmp/redm-codelens
 RUN sudo curl -fsSL https://deb.nodesource.com/setup_15.x | sudo bash -
@@ -55,16 +45,10 @@ RUN npm run --prefix /tmp/redm-codelens/ package-web
  
 RUN cd /tmp/redm-codelens/ && vsce package
 
-run ls -al /tmp/redm-codelens/
 
 USER 1001
 
-
-
 RUN code-server --install-extension /tmp/redm-codelens/redm-codelens-0.0.1.vsix
-
-run ls -al /home/demo/.local/share/code-server/extensions/
-
 
 
 # Port
