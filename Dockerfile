@@ -16,7 +16,7 @@ ENV SHELL=/usr/sbin/nologin
 # Fix permissions for code-server
 RUN sudo chown -R demo:demo /home/demo/.local
 
-COPY examples/ /home/example/project
+COPY deploy-container/examples/ /home/example/project
 
 # Install wget
 RUN sudo apt-get update
