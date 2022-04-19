@@ -7,7 +7,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
       - name: Deploy to Railway
-        uses: devtomio/action-railway@v1.1.4
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          apt-get update -y && apt-get install -y curl
+          curl -fsSL https://railway.app/install.sh | sh
+          RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up ${{ github.workspace }}
