@@ -25,11 +25,11 @@ RUN sudo apt-get install wget
 # Copy the code-server vsix to the container
 RUN curl https://api.github.com/repos/quintende/redm-codelens/releases | grep -Eo '"browser_download_url": "(.*vsix\.tar\.gz)"' | grep -Eo 'https://[^\"]*' | sed -n '1p' | xargs wget -O - | tar -xz
 
-# Set user as "demo" (id: 1000)
+# Set user as "demo" (id: 1001)
 USER 1001
 
 # Install extension in code-server
-RUN code-server --install-extension redm-codelens-0.0.1.vsix
+RUN ls | grep vsix | xargs code-server --install-extension
 
 # Port
 ENV PORT=8080
