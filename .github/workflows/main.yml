@@ -1,17 +1,12 @@
-
 name: Deploy to Railway
-
 on:
-  schedule: 
-    - cron: '0 */12 * * *'
-
+  schedule:
+    - cron: 0 */12 * * *
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: devtomio/action-railway@v1.1.4
       - with:
-         railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          railway_token: '${{ secrets.RAILWAY_TOKEN }}'
