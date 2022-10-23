@@ -1,5 +1,7 @@
 {
   "workbench.colorTheme": "Default Dark+",
   "workbench.activityBar.visible": false,
-  "workbench.startupEditor": "readme"
+  "workbench.startupEditor": "readme",
+  "workbench.editor.showTabs": false,
+  "update.showReleaseNotes": false
 }
